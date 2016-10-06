@@ -1,0 +1,134 @@
+bedroom = bedroomState()
+livingRoom = None
+kitchen = bedroomState()
+balcony = bedroomState()
+
+#class locationState(Object):
+
+class gameActor(Object):
+    health = None
+    locationState = None
+
+class enemy(gameActor):
+    attackDmg = None
+    def __init__(self, location):
+        self.locationState = location
+    def attack(self, enemyPointer):
+        if (enemyPointer.locationState is self.locationState):
+            enemyPointer.minusHealth(self.attackDmg)
+    def minusHealth(self, value):
+        self.health -= value
+    def plusHealth(self, value):
+        self.health += value
+    def setHealth(self, value):
+        self.health = value
+
+class evilRobot(enemy):
+    attackDmg = 1
+    def __init__(self, location):
+        super(evilRobot, self).__init__(self, location)
+        health = 20
+    
+class player(gameActor):
+    actionVerbs = {'attack':self.attack}
+    movementVerbs = {'go': self.locationState.execute, 'jump':self.locationState.execute}
+    attackDmg = 10
+    def __init__(self):
+        self.locationState = bedroom
+        self.health = 100
+    def execute(self, command):
+        if(command[0] in movementVerbs):
+            movementVerbs[command[0]](" ".join(command))
+
+class livingRoomState(Object): 
+    def __init__(self):
+        self.balconyDoorOpen = False
+        self.frontDoorOpen = False
+
+    def execute(self, input):
+        if(input == 'balcony close'):
+            if (!balconyDoorOpen):
+                print("The door's already closed.")
+            else:
+                self.balconyDoorOpen=False
+                print("You slide the balcony door closed.")
+        elif(input == 'balcony open'):
+            if (balconyDoorOpen):
+                print("The door's already open.")
+            else:
+                self.balconyDoorOpen=True
+                print("You slide the balcony door open.")
+        elif(input == 'go bedroom'):
+            return bedroom
+        elif(input == 'go living room'):
+            return livingRoom
+        elif(input == 'go kitchen'):
+            return kitchen
+        elif(input == 'go balcony'):
+            return balcony
+
+    def enter(self):
+        print("You're in the living room.")
+    def exit(self):
+        print("You walk out of the living room.")
+
+class balconyState(Object):
+    def execute(self, input):
+        if(input == 'go living-room'):
+            return livingRoom
+        elif(input == 'go balcony'):
+            print("You're already on the balcony.")
+            return balcony
+        elif(input == 'jump'):
+            print("Hey! Careful about jumping here! It's a long way down...")
+        elif(input == 'jump off'):
+            print("Ok, you're falling now. This is bad...")
+            playerOne.setHealth(0)
+            print("Now you've landed. Hoo boy. ...wow, you left quite the mess.")
+
+        else:
+            print("You can't get there from here.")
+            return balcony
+
+    def enter(self):
+        print("You're in the bedroom now.")
+
+    def exit(self):
+        print("You walk back into the apartment from the balcony.")
+
+class bedroomState(Object):
+    def execute(self, input):
+        if(input == 'go living-room'):
+            return livingRoom
+        elif(input == 'go bedroom'):
+            print("You're already in the bedroom.")
+            return bedroom
+        else:
+            print("You can't get there from here.")
+            return bedroom
+
+    def enter(self):
+        print("You're in the bedroom now.")
+
+    def exit(self):
+        print("You walk out of the bedroom through the doorway.")
+
+gameVerbVocab = {'go','jump','attack'}
+gameNounPrepVocab = {'robot','living-room','kitchen','bedroom','balcony','up','off'}
+
+def getInput():
+    commandInput = input(">> ").split(" ")
+    if((commandInput[0] in gameVerbVocab)&&(command[1] in gameNounPrepVocab)&&(len(commandInput)<3)&&(len(commandInput)>0)):
+        playerOne.execute(command)
+    else:
+        print("Please limit input to verb-noun or verb-preposition pairs.")
+        print("Available verbs: 'attack', 'go', 'jump'(if you're on the balcony)")
+        print("Available nouns/preps: 'living-room', 'bedroom', 'balcony', 'kitchen', 'off' or 'up' (following 'jump' if you're on the balcony), 'robot'")
+
+while(True):
+    livingRoom = livingRoomState()
+    playerOne = player()
+    while(playerOne.health > 0):
+        getInput()
+        
+
