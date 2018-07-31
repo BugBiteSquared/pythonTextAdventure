@@ -1,3 +1,5 @@
 # pythonTextAdventure
 
-This is a basic text adventure written for Python 3+. 
+A basic text adventure written for Python 3.
+
+This isn't maintained & was just written in a day to play with the State design pattern.
